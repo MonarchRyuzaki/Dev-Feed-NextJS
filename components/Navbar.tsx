@@ -1,25 +1,19 @@
 "use client";
+import { useAuthStore } from "@/providers/auth-store-provider";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const { login, logout, checkAuth, isLoggedIn } = useAuthStore(
+    (store) => store
+  );
+  const router = useRouter();
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/me");
-        const data = await res.json();
-        setIsLoggedIn(data?.loggedIn ?? false);
-      } catch (err) {
-        console.error("Failed to check login status", err);
-        setIsLoggedIn(false);
-      }
-    };
-
     checkAuth();
   }, []);
-  const login = async () => {
+
+  const handleLogin = async () => {
     const res = await fetch("/api/login", {
       method: "POST",
       headers: {
@@ -30,13 +24,9 @@ export default function Navbar() {
         password: "pass123",
       }),
     });
-    if (res.ok) location.reload();
-  };
-  const logout = async () => {
-    await fetch("/api/logout", {
-      method: "POST",
-    });
-    location.reload();
+    const data = await res.json();
+    login(data.user);
+    router.refresh();
   };
   return (
     <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between">
@@ -46,9 +36,16 @@ export default function Navbar() {
       <div className="space-x-4">
         <Link href="/dashboard">Dashboard</Link>
         {isLoggedIn ? (
-          <button onClick={logout}>Logout</button>
+          <button
+            onClick={() => {
+              logout();
+              router.push("/");
+            }}
+          >
+            Logout
+          </button>
         ) : (
-          <button onClick={login}>Login</button>
+          <button onClick={handleLogin}>Login</button>
         )}
       </div>
     </nav>
