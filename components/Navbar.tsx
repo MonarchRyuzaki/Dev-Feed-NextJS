@@ -2,7 +2,7 @@
 import { useAuthStore } from "@/providers/auth-store-provider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function Navbar() {
   const { login, logout, checkAuth, isLoggedIn } = useAuthStore(
