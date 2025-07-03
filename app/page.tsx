@@ -4,7 +4,6 @@ const HomePage = async () => {
   const res = await fetch("http://localhost:3000/api/posts", {
     next: { revalidate: 5 },
   });
-  console.log("x-nextjs-cache", res.headers.get("x-nextjs-cache"));
   const data = await res.json();
   const posts = data.posts;
   return (
